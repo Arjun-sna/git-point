@@ -273,7 +273,7 @@ class Login extends Component {
 
   render() {
     const { locale, isLoggingIn, hasInitialUser } = this.props;
-    const loginUrl = `https://github.com/login/oauth/authorize?response_type=token&client_id=${CLIENT_ID}&redirect_uri=gitpoint://welcome&scope=user%20repo&state=${stateRandom}`;
+    const loginUrl = `https://github.com/login/oauth/authorize?response_type=token&client_id=${CLIENT_ID}&redirect_uri=gitpoint://welcome&scope=user%20repo%20read:org&state=${stateRandom}`;
 
     return (
       <ViewContainer>
@@ -370,20 +370,22 @@ class Login extends Component {
             </ModalWrapper>
           </Modal>
         )}
-        {isLoggingIn &&
-          !hasInitialUser && (
-            <BrowserLoader>
-              <BrowserLoadingLabel>{this.state.loaderText}</BrowserLoadingLabel>
-              <ActivityIndicator
-                animating={isLoggingIn}
-                color={colors.white}
-                size="large"
-              />
-            </BrowserLoader>
-          )}
+        {isLoggingIn && !hasInitialUser && (
+          <BrowserLoader>
+            <BrowserLoadingLabel>{this.state.loaderText}</BrowserLoadingLabel>
+            <ActivityIndicator
+              animating={isLoggingIn}
+              color={colors.white}
+              size="large"
+            />
+          </BrowserLoader>
+        )}
       </ViewContainer>
     );
   }
 }
 
-export const LoginScreen = connect(mapStateToProps, mapDispatchToProps)(Login);
+export const LoginScreen = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);

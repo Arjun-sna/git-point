@@ -17,6 +17,7 @@ export const ORGS_GET_MEMBERS = createPaginationActionSet('ORGS_GET_MEMBERS');
 export const ORGS_GET_BY_ID = createActionSet('ORGS_GET_BY_ID');
 
 export const GRAPHQL_GET_REPO = createActionSet('GRAPHQL_GET_REPO');
+export const GRAPHQL_GET_USER_INFO = createActionSet('GRAPHQL_GET_USER_INFO');
 
 export const REPOS_GET_CONTRIBUTORS = createPaginationActionSet(
   'REPOS_GET_CONTRIBUTORS'

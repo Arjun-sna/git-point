@@ -6,7 +6,7 @@ import { version } from 'package.json';
 import { Platform } from 'react-native';
 
 import Schemas from './schemas';
-import { repoQuery } from './queries';
+import { repoQuery, userInfoQuery } from './queries';
 
 type SpecialParameters = {
   forceRefresh?: boolean,
@@ -256,6 +256,14 @@ export class Client {
         query: repoQuery,
         variables: { owner, name },
         schema: Schemas.GQL_REPO,
+      });
+    },
+    getUserInfo: (login: string, params: SpecialParameters = {}) => {
+      return this.query({
+        params,
+        query: userInfoQuery,
+        variables: { login },
+        schema: Schemas.GQL_USER,
       });
     },
   };

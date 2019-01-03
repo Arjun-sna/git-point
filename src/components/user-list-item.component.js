@@ -148,7 +148,7 @@ class UserListItemComponent extends Component {
             >
               <Avatar
                 source={{
-                  uri: user.avatar_url,
+                  uri: user.avatarUrl,
                 }}
               />
             </ImageContainerComponent>

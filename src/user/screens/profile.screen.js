@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { isEmpty } from 'lodash';
 import {
   ActivityIndicator,
   Dimensions,
@@ -22,40 +22,51 @@ import {
 } from 'components';
 import { emojifyText, t, openURLInView } from 'utils';
 import { colors, fonts } from 'config';
-import {
-  getUserInfo,
-  getStarCount,
-  getIsFollowing,
+import { RestClient } from 'api';
+import { getIsFollower, changeFollowStatus } from '../user.action';
+
+const mapStateToProps = (state, props) => {
+  const currentUser = props.navigation.state.params.user;
+  const userData = state.entities.gqlUsers[currentUser.login];
+  const userDataAvailable = !isEmpty(userData);
+  const propsToSend = userDataAvailable
+    ? {
+        user: userData,
+        orgs: userData.organizations.nodes,
+        starCount: userData.starredRepositories.totalCount,
+        isFollowing: userData.viewerIsFollowing,
+        isFollower: false,
+        isPendingUser: false,
+        isPendingOrgs: false,
+        isPendingStarCount: false,
+        isPendingCheckFollowing: false,
+        isPendingCheckFollower: false,
+      }
+    : {
+        user: {},
+        orgs: [],
+        starCount: 0,
+        isFollowing: false,
+        isFollower: false,
+        isPendingUser: true,
+        isPendingOrgs: true,
+        isPendingStarCount: true,
+        isPendingCheckFollowing: true,
+        isPendingCheckFollower: true,
+      };
+
+  return {
+    auth: state.auth.user,
+    locale: state.auth.locale,
+    ...propsToSend,
+  };
+};
+
+const mapDispatchToProps = {
+  getUserInfo: RestClient.graphql.getUserInfo,
   getIsFollower,
   changeFollowStatus,
-} from '../user.action';
-
-const mapStateToProps = state => ({
-  auth: state.auth.user,
-  user: state.user.user,
-  orgs: state.user.orgs,
-  starCount: state.user.starCount,
-  locale: state.auth.locale,
-  isFollowing: state.user.isFollowing,
-  isFollower: state.user.isFollower,
-  isPendingUser: state.user.isPendingUser,
-  isPendingOrgs: state.user.isPendingOrgs,
-  isPendingStarCount: state.user.isPendingStarCount,
-  isPendingCheckFollowing: state.user.isPendingCheckFollowing,
-  isPendingCheckFollower: state.user.isPendingCheckFollower,
-});
-
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      getUserInfo,
-      getStarCount,
-      getIsFollowing,
-      getIsFollower,
-      changeFollowStatus,
-    },
-    dispatch
-  );
+};
 
 const BioListItem = styled(ListItem).attrs({
   containerStyle: {
@@ -71,8 +82,6 @@ const BioListItem = styled(ListItem).attrs({
 class Profile extends Component {
   props: {
     getUserInfo: Function,
-    getStarCount: Function,
-    getIsFollowing: Function,
     getIsFollower: Function,
     changeFollowStatus: Function,
     auth: Object,
@@ -113,8 +122,8 @@ class Profile extends Component {
 
     Promise.all([
       this.props.getUserInfo(user.login),
-      this.props.getStarCount(user.login),
-      this.props.getIsFollowing(user.login, auth.login),
+      // this.props.getStarCount(user.login),
+      // this.props.getIsFollowing(user.login, auth.login),
       this.props.getIsFollower(user.login, auth.login),
     ]).then(() => {
       this.setState({ refreshing: false });
@@ -202,42 +211,40 @@ class Profile extends Component {
             />
           )}
 
-          {!isPending &&
-            initialUser.login === user.login && (
-              <View>
-                {!!user.bio &&
-                  user.bio !== '' && (
-                    <SectionList title={t('BIO', locale)}>
-                      <BioListItem
-                        titleNumberOfLines={0}
-                        title={emojifyText(user.bio)}
-                        hideChevron
-                      />
-                    </SectionList>
-                  )}
-
-                <EntityInfo
-                  entity={user}
-                  orgs={orgs}
-                  navigation={navigation}
-                  locale={locale}
-                />
-
-                <SectionList
-                  title={t('ORGANIZATIONS', locale)}
-                  noItems={orgs.length === 0}
-                  noItemsMessage={t('No organizations', locale)}
-                >
-                  {orgs.map(item => (
-                    <UserListItem
-                      key={item.id}
-                      user={item}
-                      navigation={navigation}
-                    />
-                  ))}
+          {!isPending && initialUser.login === user.login && (
+            <View>
+              {!!user.bio && user.bio !== '' && (
+                <SectionList title={t('BIO', locale)}>
+                  <BioListItem
+                    titleNumberOfLines={0}
+                    title={emojifyText(user.bio)}
+                    hideChevron
+                  />
                 </SectionList>
-              </View>
-            )}
+              )}
+
+              <EntityInfo
+                entity={user}
+                orgs={orgs}
+                navigation={navigation}
+                locale={locale}
+              />
+
+              <SectionList
+                title={t('ORGANIZATIONS', locale)}
+                noItems={orgs.length === 0}
+                noItemsMessage={t('No organizations', locale)}
+              >
+                {orgs.map(item => (
+                  <UserListItem
+                    key={item.id}
+                    user={item}
+                    navigation={navigation}
+                  />
+                ))}
+              </SectionList>
+            </View>
+          )}
         </ParallaxScroll>
 
         <ActionSheet
@@ -254,6 +261,7 @@ class Profile extends Component {
   }
 }
 
-export const ProfileScreen = connect(mapStateToProps, mapDispatchToProps)(
-  Profile
-);
+export const ProfileScreen = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Profile);

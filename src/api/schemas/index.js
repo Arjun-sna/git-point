@@ -4,6 +4,7 @@ import { issueSchema, issueTimelineItemSchema } from './issues';
 import { orgSchema } from './orgs';
 import { userSchema } from './users';
 import { gqlRepoSchema } from './gql-repos';
+import { gqlUserSchema } from './glq-users';
 
 export default {
   EVENT: eventSchema,
@@ -17,4 +18,5 @@ export default {
   ORG: orgSchema,
   ORG_ARRAY: [orgSchema],
   GQL_REPO: gqlRepoSchema,
+  GQL_USER: gqlUserSchema,
 };

@@ -10,6 +10,7 @@ export const entities = (
     issueTimelineItems: {},
     users: {},
     gqlRepos: {},
+    gqlUsers: {},
   },
   action
 ) => {
