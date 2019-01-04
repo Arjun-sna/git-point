@@ -148,7 +148,7 @@ class UserListItemComponent extends Component {
             >
               <Avatar
                 source={{
-                  uri: user.avatarUrl,
+                  uri: user.avatarUrl || user.avatar_url, // need this check to make it work with both graphql data and REST api data
                 }}
               />
             </ImageContainerComponent>
