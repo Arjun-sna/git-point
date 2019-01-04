@@ -102,9 +102,9 @@ export class UserProfile extends Component {
 
   getUserUri = () => {
     const { initialUser, user } = this.props;
-    const image = initialUser.avatarUrl
-      ? `${initialUser.avatarUrl}&lastModified=${initialUser.updatedAt}`
-      : `${user.avatarUrl}&lastModified=${user.updatedAt}`;
+    const image = initialUser.avatar_url
+      ? `${initialUser.avatar_url}&lastModified=${initialUser.updatedAt}`
+      : `${user.avatar_url}&lastModified=${user.updatedAt}`;
 
     return { uri: image };
   };
@@ -123,7 +123,7 @@ export class UserProfile extends Component {
 
     return (
       <Container>
-        {((user.hasOwnProperty('publicRepos') &&
+        {((user.hasOwnProperty('public_repos') &&
           !isNaN(parseInt(starCount, 10))) ||
           type === 'org') && (
           <Wrapper nativeId="user-profile-container">
@@ -144,15 +144,14 @@ export class UserProfile extends Component {
                     user,
                     repoCount: Math.min(
                       maxLoadingConstraints.maxPublicRepos,
-                      user.publicRepos.totalCount
+                      user.public_repos
                     ),
                   })
                 }
               >
                 <UnitNumber>
-                  {!isNaN(parseInt(user.publicRepos.totalCount, 10))
-                    ? user.publicRepos.totalCount +
-                      (user.privateRepos.totalCount || 0)
+                  {!isNaN(parseInt(user.public_repos, 10))
+                    ? user.public_repos + (user.private_repos || 0)
                     : ' '}
                 </UnitNumber>
                 <UnitText>{t('Repositories', locale)}</UnitText>
@@ -188,14 +187,14 @@ export class UserProfile extends Component {
                       user,
                       followerCount: Math.min(
                         maxLoadingConstraints.maxFollowers,
-                        user.followers.totalCount
+                        user.followers
                       ),
                     })
                   }
                 >
                   <UnitNumber>
-                    {!isNaN(parseInt(user.followers.totalCount, 10))
-                      ? user.followers.totalCount
+                    {!isNaN(parseInt(user.followers, 10))
+                      ? user.followers
                       : ' '}
                   </UnitNumber>
                   <UnitText>{t('Followers', locale)}</UnitText>
@@ -216,14 +215,14 @@ export class UserProfile extends Component {
                       user,
                       followingCount: Math.min(
                         maxLoadingConstraints.maxFollowing,
-                        user.following.totalCount
+                        user.following
                       ),
                     })
                   }
                 >
                   <UnitNumber>
-                    {!isNaN(parseInt(user.following.totalCount, 10))
-                      ? user.following.totalCount
+                    {!isNaN(parseInt(user.following, 10))
+                      ? user.following
                       : ' '}
                   </UnitNumber>
                   <UnitText>{t('Following', locale)}</UnitText>

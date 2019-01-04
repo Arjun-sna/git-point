@@ -4,15 +4,15 @@ export const userInfoQuery = `fragment totalCount on RepositoryConnection {
 
 fragment nodeInfo on Actor {
   login
-  avatarUrl
+  avatar_url: avatarUrl
   url
 }
 
 fragment repoInfo on RepositoryOwner {
-  publicRepos: repositories(ownerAffiliations: [OWNER], privacy: PUBLIC) {
+  public_repos: repositories(ownerAffiliations: [OWNER], privacy: PUBLIC) {
     ...totalCount
   }
-  privateRepos: repositories(ownerAffiliations: [OWNER], privacy: PRIVATE) {
+  private_repos: repositories(ownerAffiliations: [OWNER], privacy: PRIVATE) {
     ...totalCount
   }
   allReposCount: repositories(ownerAffiliations: [OWNER]) {

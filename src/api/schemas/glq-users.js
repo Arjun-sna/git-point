@@ -14,6 +14,10 @@ export const gqlUserSchema = new schema.Entity(
           type: 'org',
         })),
       },
+      public_repos: user.public_repos.totalCount,
+      private_repos: user.private_repos.totalCount,
+      followers: user.followers.totalCount,
+      following: user.following.totalCount,
     }),
   }
 );
