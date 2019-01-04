@@ -35,11 +35,8 @@ const mapStateToProps = (state, props) => {
         orgs: userData.organizations.nodes,
         starCount: userData.starredRepositories.totalCount,
         isFollowing: userData.viewerIsFollowing,
-        isFollower: false,
+        isFollower: state.user.isFollower,
         isPendingUser: false,
-        isPendingOrgs: false,
-        isPendingStarCount: false,
-        isPendingCheckFollowing: false,
         isPendingCheckFollower: false,
       }
     : {
@@ -47,11 +44,8 @@ const mapStateToProps = (state, props) => {
         orgs: [],
         starCount: 0,
         isFollowing: false,
-        isFollower: false,
+        isFollower: state.user.isFollower,
         isPendingUser: true,
-        isPendingOrgs: true,
-        isPendingStarCount: true,
-        isPendingCheckFollowing: true,
         isPendingCheckFollower: true,
       };
 
@@ -92,9 +86,6 @@ class Profile extends Component {
     isFollowing: boolean,
     isFollower: boolean,
     isPendingUser: boolean,
-    isPendingOrgs: boolean,
-    isPendingStarCount: boolean,
-    isPendingCheckFollowing: boolean,
     isPendingCheckFollower: boolean,
     navigation: Object,
   };
@@ -111,19 +102,23 @@ class Profile extends Component {
   }
 
   componentDidMount() {
-    this.getUserInfo();
+    this.getUserInfo(false);
   }
 
-  getUserInfo = () => {
-    this.setState({ refreshing: true });
+  getUserInfo = (forceRefresh = true) => {
+    if (
+      forceRefresh ||
+      this.props.isPendingUser ||
+      this.props.isPendingCheckFollower
+    ) {
+      this.setState({ refreshing: true });
+    }
 
     const user = this.props.navigation.state.params.user;
     const auth = this.props.auth;
 
     Promise.all([
       this.props.getUserInfo(user.login),
-      // this.props.getStarCount(user.login),
-      // this.props.getIsFollowing(user.login, auth.login),
       this.props.getIsFollower(user.login, auth.login),
     ]).then(() => {
       this.setState({ refreshing: false });
@@ -153,20 +148,12 @@ class Profile extends Component {
       isFollowing,
       isFollower,
       isPendingUser,
-      isPendingOrgs,
-      isPendingStarCount,
-      isPendingCheckFollowing,
       isPendingCheckFollower,
       navigation,
     } = this.props;
     const { refreshing } = this.state;
     const initialUser = navigation.state.params.user;
-    const isPending =
-      isPendingUser ||
-      isPendingOrgs ||
-      isPendingStarCount ||
-      isPendingCheckFollowing ||
-      isPendingCheckFollower;
+    const isPending = isPendingUser || isPendingCheckFollower;
     const userActions = [
       isFollowing ? t('Unfollow', locale) : t('Follow', locale),
       t('Open in Browser', locale),
@@ -194,11 +181,7 @@ class Profile extends Component {
             />
           }
           stickyTitle={user.login}
-          showMenu={
-            !isPendingUser &&
-            !isPendingCheckFollowing &&
-            initialUser.login === user.login
-          }
+          showMenu={!isPendingUser && initialUser.login === user.login}
           menuAction={() => this.showMenuActionSheet()}
           navigateBack
           navigation={navigation}
